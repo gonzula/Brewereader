@@ -139,7 +139,7 @@ def unwarp(img, topEdge, bottomEdge, leftEdge, rightEdge):
 
 def find_lines(img):
     if len(img.shape) == 3 and img.shape[2] == 3:  # if it's color
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     img = cv2.GaussianBlur(img, (11, 11), 0)
     img = cv2.adaptiveThreshold(
             img,
