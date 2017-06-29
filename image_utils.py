@@ -187,6 +187,9 @@ def find_lines(img):
     horizontal = [line[0] for line in horizontal]
     vertical = [line[0] for line in vertical]
 
+    horizontal = np.asarray(horizontal)
+    vertical = np.asarray(vertical)
+
     return horizontal, vertical
 
 
