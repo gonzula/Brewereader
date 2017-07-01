@@ -77,71 +77,44 @@ def line_dist(l1, l2, shape):
             )
 
 
-def intersections(topEdge, bottomEdge, leftEdge, rightEdge, shape):
+def intersection(horizontal, vertical, shape):
     height = shape[0]
     width = shape[1]
 
-    if abs(leftEdge[1]) > float_info.epsilon:
-        left1 = 0, leftEdge[0]/np.sin(leftEdge[1])
-        left2 = width, -width/np.tan(leftEdge[1]) + left1[1]
+    if abs(vertical[1]) > float_info.epsilon:
+        vertical1 = 0, vertical[0]/np.sin(vertical[1])
+        vertical2 = width, -width/np.tan(vertical[1]) + vertical1[1]
     else:
-        left1 = leftEdge[0]/np.cos(leftEdge[1]), 0
-        left2 = left1[0] - height * np.tan(leftEdge[1]), height
+        vertical1 = vertical[0]/np.cos(vertical[1]), 0
+        vertical2 = vertical1[0] - height * np.tan(vertical[1]), height
 
-    if abs(rightEdge[1]) > float_info.epsilon:
-        right1 = 0, rightEdge[0]/np.sin(rightEdge[1])
-        right2 = width, -width/np.sin(rightEdge[1]) + right1[1]
-    else:
-        right1 = rightEdge[0]/np.cos(rightEdge[1]), 0
-        right2 = right1[0] - height * np.tan(rightEdge[1]), height
+    horizontal1 = 0, horizontal[0]/np.sin(horizontal[1])
+    horizontal2 = width, -width/np.tan(horizontal[1]) + horizontal1[1]
 
-    bottom1 = 0, bottomEdge[0]/np.sin(bottomEdge[1])
-    bottom2 = width, -width/np.tan(bottomEdge[1]) + bottom1[1]
+    verticalA = vertical2[1] - vertical1[1]
+    verticalB = vertical1[0] - vertical2[0]
+    verticalC = verticalA * vertical1[0] + verticalB * vertical1[1]
 
-    top1 = 0, topEdge[0]/np.sin(topEdge[1])
-    top2 = width, -width/np.tan(topEdge[1]) + top1[1]
+    horizontalA = horizontal2[1] - horizontal1[1]
+    horizontalB = horizontal1[0] - horizontal2[0]
+    horizontalC = horizontalA * horizontal1[0] + horizontalB * horizontal1[1]
 
-    leftA = left2[1] - left1[1]
-    leftB = left1[0] - left2[0]
-    leftC = leftA * left1[0] + leftB * left1[1]
-
-    rightA = right2[1] - right1[1]
-    rightB = right1[0] - right2[0]
-    rightC = rightA * right1[0] + rightB * right1[1]
-
-    topA = top2[1] - top1[1]
-    topB = top1[0] - top2[0]
-    topC = topA * top1[0] + topB * top1[1]
-
-    bottomA = bottom2[1] - bottom1[1]
-    bottomB = bottom1[0] - bottom2[0]
-    bottomC = bottomA * bottom1[0] + bottomB * bottom1[1]
-
-    detTopLeft = leftA * topB - leftB * topA
-    ptTopLeft = (
-            (topB * leftC - leftB * topC)/detTopLeft,
-            (leftA * topC - topA * leftC)/detTopLeft,
+    det = verticalA * horizontalB - verticalB * horizontalA
+    pt = (
+            (horizontalB * verticalC - verticalB * horizontalC)/det,
+            (verticalA * horizontalC - horizontalA * verticalC)/det,
             )
 
-    detTopRight = rightA * topB - rightB * topA
-    ptTopRight = (
-            (topB * rightC - rightB * topC)/detTopRight,
-            (rightA * topC - topA * rightC)/detTopRight,
-            )
+    return pt
 
-    detBottomRight = rightA * bottomB - rightB * bottomA
-    ptBottomRight = (
-            (bottomB * rightC - rightB * bottomC)/detBottomRight,
-            (rightA * bottomC - bottomA * rightC)/detBottomRight,
-            )
 
-    detBottomLeft = leftA * bottomB - leftB * bottomA
-    ptBottomLeft = (
-            (bottomB * leftC - leftB * bottomC)/detBottomLeft,
-            (leftA * bottomC - bottomA * leftC)/detBottomLeft,
+def intersections(topEdge, bottomEdge, leftEdge, rightEdge, shape):
+    return (
+            intersection(topEdge, leftEdge, shape),
+            intersection(topEdge, rightEdge, shape),
+            intersection(bottomEdge, rightEdge, shape),
+            intersection(bottomEdge, leftEdge, shape),
             )
-
-    return ptTopLeft, ptTopRight, ptBottomRight, ptBottomLeft
 
 
 def unwarp(
