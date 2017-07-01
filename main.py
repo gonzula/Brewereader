@@ -40,24 +40,20 @@ if __name__ == '__main__':
 
         # Check if the walls exists
         if min(rho for rho, theta in horizontal[0]) > 20:
-            print('creating top wall')
             horizontal.insert(
                     0,
                     [np.array([0, np.pi/2])]
                     )
         if abs(img.shape[0] - max(rho for rho, theta in horizontal[-1])) > 20:
-            print('creating bottom wall')
             horizontal.append(
                     [np.array([img.shape[0], np.pi/2])]
                     )
         if min(rho for rho, theta in vertical[0]) > 20:
-            print('creating left wall')
             vertical.insert(
                     0,
                     [np.array([0, 0])]
                     )
         if abs(img.shape[1] - max(rho for rho, theta in vertical[-1])) > 20:
-            print('creating right wall')
             vertical.append(
                     [np.array([img.shape[1], 0])]
                     )
