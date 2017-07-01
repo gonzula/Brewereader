@@ -108,13 +108,63 @@ def intersection(horizontal, vertical, shape):
     return pt
 
 
-def intersections(topEdge, bottomEdge, leftEdge, rightEdge, shape):
-    return (
-            intersection(topEdge, leftEdge, shape),
-            intersection(topEdge, rightEdge, shape),
-            intersection(bottomEdge, rightEdge, shape),
-            intersection(bottomEdge, leftEdge, shape),
-            )
+def intersections(
+        topEdge,
+        bottomEdge,
+        leftEdge,
+        rightEdge,
+        shape,
+        group=False,
+        maximize=True,
+        ):
+    if group:
+        if maximize:
+            ptTopLeft = (np.inf, np.inf)
+            ptTopRight = (-np.inf, np.inf)
+            ptBottomLeft = (np.inf, -np.inf)
+            ptBottomRight = (-np.inf, -np.inf)
+            _max, _min = max, min
+        else:
+            ptTopLeft = (-np.inf, -np.inf)
+            ptTopRight = (np.inf, -np.inf)
+            ptBottomLeft = (-np.inf, np.inf)
+            ptBottomRight = (np.inf, np.inf)
+            _max, _min = min, max
+
+        for t in topEdge:
+            for l in leftEdge:
+                tl = intersection(t, l, shape)
+                ptTopLeft = (
+                        _min(ptTopLeft[0], tl[0]),
+                        _min(ptTopLeft[1], tl[1]),
+                        )
+            for r in rightEdge:
+                tr = intersection(t, r, shape)
+                ptTopRight = (
+                        _max(ptTopRight[0], tr[0]),
+                        _min(ptTopRight[1], tr[1]),
+                        )
+        for b in bottomEdge:
+            for l in leftEdge:
+                bl = intersection(b, l, shape)
+                ptBottomLeft = (
+                        _min(ptBottomLeft[0], bl[0]),
+                        _max(ptBottomLeft[1], bl[1]),
+                        )
+            for r in rightEdge:
+                br = intersection(b, r, shape)
+                ptBottomRight = (
+                        _max(ptBottomRight[0], br[0]),
+                        _max(ptBottomRight[1], br[1]),
+                        )
+        return (ptTopLeft, ptTopRight, ptBottomRight, ptBottomLeft)
+    else:
+        return (
+                intersection(topEdge, leftEdge, shape),
+                intersection(topEdge, rightEdge, shape),
+                intersection(bottomEdge, rightEdge, shape),
+                intersection(bottomEdge, leftEdge, shape),
+                )
 
 
 def unwarp(
@@ -130,72 +180,14 @@ def unwarp(
 
     shape = img.shape
 
-    if group:
-        start = time.time()
-        if maximize:
-            ptTopLeft = (np.inf, np.inf)
-            ptTopRight  = (-np.inf, np.inf)
-            ptBottomLeft = (np.inf, -np.inf)
-            ptBottomRight = (-np.inf, -np.inf)
-        else:
-            ptTopLeft = (-np.inf, -np.inf)
-            ptTopRight  = (np.inf, -np.inf)
-            ptBottomLeft = (-np.inf, np.inf)
-            ptBottomRight = (np.inf, np.inf)
-        for t in topEdge:
-            for b in bottomEdge:
-                for l in leftEdge:
-                    for r in rightEdge:
-                        tl, tr, br, bl = intersections(
-                                t,
-                                b,
-                                l,
-                                r,
-                                shape)
-                        if maximize:
-                            ptTopLeft = (
-                                    min(ptTopLeft[0], tl[0]),
-                                    min(ptTopLeft[1], tl[1]),
-                                    )
-                            ptTopRight = (
-                                    max(ptTopRight[0], tr[0]),
-                                    min(ptTopRight[1], tr[1]),
-                                    )
-                            ptBottomLeft = (
-                                    min(ptBottomLeft[0], bl[0]),
-                                    max(ptBottomLeft[1], bl[1]),
-                                    )
-                            ptBottomRight = (
-                                    max(ptBottomRight[0], br[0]),
-                                    max(ptBottomRight[1], br[1]),
-                                    )
-                        else:
-                            ptTopLeft = (
-                                    max(ptTopLeft[0], tl[0]),
-                                    max(ptTopLeft[1], tl[1]),
-                                    )
-                            ptTopRight = (
-                                    min(ptTopRight[0], tr[0]),
-                                    max(ptTopRight[1], tr[1]),
-                                    )
-                            ptBottomLeft = (
-                                    max(ptBottomLeft[0], bl[0]),
-                                    min(ptBottomLeft[1], bl[1]),
-                                    )
-                            ptBottomRight = (
-                                    min(ptBottomRight[0], br[0]),
-                                    min(ptBottomRight[1], br[1]),
-                                    )
-
-        end = time.time() - start
-        print(f'took {end} secods to find intersections')
-    else:
-        ptTopLeft, ptTopRight, ptBottomRight, ptBottomLeft = intersections(
-                topEdge,
-                bottomEdge,
-                leftEdge,
-                rightEdge,
-                shape)
+    ptTopLeft, ptTopRight, ptBottomRight, ptBottomLeft = intersections(
+            topEdge,
+            bottomEdge,
+            leftEdge,
+            rightEdge,
+            shape,
+            group,
+            maximize)
 
     if dest_size is None:
         def dist(p1, p2):
