@@ -12,7 +12,8 @@ import os
 
 if __name__ == '__main__':
     dirname = 'images_set'
-    for fname in ['natalia.png', ]:  # 'pestana2.png']:  # os.listdir(dirname):
+    img_cnt = 0
+    for fname in os.listdir(dirname):
         if not fname.endswith('.png'):
             continue
         fname = os.path.join(dirname, fname)
@@ -65,19 +66,27 @@ if __name__ == '__main__':
         # vertical = sorted(
         #         vertical,
         #         key=lambda bin: iu.mid_point(bin[0], img.shape)[0])
-        # for bin in horizontal + vertical:
+
+
+        # wl = img
+        # colors = [
+        #         (255, 0, 0),
+        #         (0, 255, 0),
+        #         (0, 0, 255),
+        #         ]
+        # for idx, bin in enumerate(horizontal + vertical):
+        #     color = colors[idx % len(colors)]
         #     for rho, theta in bin:
         #         pt1, pt2 = iu.cvt_line(rho, theta, img.shape)
-        #         cv2.line(img, pt1, pt2, (0, 255, 0), 5, cv2.LINE_AA)
+        #         cv2.line(wl, pt1, pt2, color, 1, cv2.LINE_AA)
 
-
-        print('horizontal')
-        pprint(horizontal)
-        print('vertical')
-        pprint(vertical)
-
-        print(len(horizontal))
-        print(len(vertical))
+        # fig, ax = plt.subplots()
+        # fig.canvas.set_window_title(fname)
+        # ax.imshow(wl)
+        # ax.axis('off')
+        # mng = plt.get_current_fig_manager()
+        # mng.full_screen_toggle()
+        # plt.show()
 
         # v = vertical
 
@@ -90,6 +99,7 @@ if __name__ == '__main__':
 
         for i in range(1, len(horizontal) - 1):
             for j in range(4, len(vertical) - 2):
+                # print(f'{i}_{j-4}')
                 tl, tr, br, bl = iu.intersections(
                         horizontal[i],
                         horizontal[i + 1],
@@ -103,15 +113,17 @@ if __name__ == '__main__':
                 bw = cell
                 if len(bw.shape) == 3 and bw.shape[2] == 3:
                     bw = cv2.cvtColor(bw, cv2.COLOR_RGB2GRAY)
-                threshold = 127
+                threshold = 150
                 bw = cv2.threshold(bw, threshold, 255, cv2.THRESH_BINARY)[1]
                 total = cell.shape[0] * cell.shape[1]
                 zero = total - cv2.countNonZero(bw)
-                if zero/total > 0.5:
+                if zero/total > 0.6:
                     print(f'skipping {i}_{j-4}')
                     continue
+                # cv2.imwrite(f'cells/{i}_{j-4}_0.png', cell)
 
                 blur = cv2.cvtColor(cell, cv2.COLOR_RGB2GRAY)
+                blur = cv2.GaussianBlur(blur, (11, 11), 0)
                 blur = cv2.adaptiveThreshold(
                         blur,
                         255,
@@ -119,7 +131,6 @@ if __name__ == '__main__':
                         cv2.THRESH_BINARY,
                         5,
                         2)
-                blur = cv2.GaussianBlur(blur, (11, 11), 0)
                 cell = blur
 
                 # blur = cv2.GaussianBlur(cell, (11, 11), 0)
@@ -127,19 +138,19 @@ if __name__ == '__main__':
                 canny = cv2.Canny(cell, 50, 200)
                 # cv2.imwrite(f'cells/{i}_{j-4}_2.png', canny)
 
-                h, v = iu.find_lines(canny, 0.4)
+                h, v = iu.find_lines(canny, 0.65, should_erode=False)
                 # cell = cv2.cvtColor(canny, cv2.COLOR_GRAY2RGB)
-                wl = cv2.cvtColor(canny, cv2.COLOR_GRAY2RGB)
 
-                if h is None:
+                if h.size == 0:
                     h = [(0, np.pi/2), (cell.shape[0]-1, np.pi/2)]
-                if v is None:
-                    h = [(0, 0), (cell.shape[1]-1, 0)]
+                if v.size == 0:
+                    v = [(0, 0), (cell.shape[1]-1, 0)]
 
-                for rho, theta in np.append(h, v, axis=0):
-                    pt1, pt2 = iu.cvt_line(rho, theta, cell.shape)
-                    cv2.line(wl, pt1, pt2, (0, 255, 0), 1, cv2.LINE_4)
-                cv2.imwrite(f'cells/{i}_{j-4}_3.png', wl)
+                # wl = cv2.cvtColor(canny, cv2.COLOR_GRAY2RGB)
+                # for rho, theta in np.append(h, v, axis=0):
+                #     pt1, pt2 = iu.cvt_line(rho, theta, cell.shape)
+                #     cv2.line(wl, pt1, pt2, (0, 255, 0), 1, cv2.LINE_4)
+                # cv2.imwrite(f'cells/{i}_{j-4}_3.png', wl)
 
                 h = iu.group_lines(
                         h,
@@ -168,16 +179,19 @@ if __name__ == '__main__':
                         br,
                         bl,
                         dest_size=(42, 28),
+                        offset=-4,
                         )
 
-                cell = cv2.adaptiveThreshold(
-                        cell,
-                        255,
-                        cv2.ADAPTIVE_THRESH_MEAN_C,
-                        cv2.THRESH_BINARY,
-                        5,
-                        2)
-                cv2.imwrite(f'cells/{i}_{j-4}_4.png', cell)
+                # cell = cv2.adaptiveThreshold(
+                #         cell,
+                #         255,
+                #         cv2.ADAPTIVE_THRESH_MEAN_C,
+                #         cv2.THRESH_BINARY,
+                #         5,
+                #         2)
+                # cv2.imwrite(f'cells/{i}_{j-4}_4.png', cell)
+                cv2.imwrite(f'cells/{j-4}_{img_cnt}.png', cell)
+                img_cnt += 1
 
                 # h = iu.merge_lines(h)
                 # v = iu.merge_lines(v)

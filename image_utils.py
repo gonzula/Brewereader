@@ -230,7 +230,7 @@ def unwarp(
     return cv2.warpPerspective(img, M, (width, height))
 
 
-def find_lines(img, acc_threshold=0.25):
+def find_lines(img, acc_threshold=0.25, should_erode=True):
     if len(img.shape) == 3 and img.shape[2] == 3:  # if it's color
         img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     img = cv2.GaussianBlur(img, (11, 11), 0)
@@ -248,7 +248,6 @@ def find_lines(img, acc_threshold=0.25):
     # edges = cv2.threshold(img, thresh, 255, cv2.THRESH_BINARY)[1]
     # edges = cv2.Canny(blur, 500, 500, apertureSize=3)
 
-    should_erode = True
     if should_erode:
         element = cv2.getStructuringElement(cv2.MORPH_RECT, (4, 4))
         img = cv2.erode(img, element)
