@@ -131,9 +131,9 @@ if __name__ == '__main__':
                 # cell = cv2.cvtColor(canny, cv2.COLOR_GRAY2RGB)
                 wl = cv2.cvtColor(canny, cv2.COLOR_GRAY2RGB)
 
-                if not h:
+                if h is None:
                     h = [(0, np.pi/2), (cell.shape[0]-1, np.pi/2)]
-                if not v:
+                if v is None:
                     h = [(0, 0), (cell.shape[1]-1, 0)]
 
                 for rho, theta in np.append(h, v, axis=0):
