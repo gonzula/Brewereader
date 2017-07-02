@@ -169,25 +169,33 @@ def intersections(
 
 def unwarp(
         img,
-        topEdge,
-        bottomEdge,
-        leftEdge,
-        rightEdge,
-        group=False,
-        maximize=True,
+        ptTopLeft,
+        ptTopRight,
+        ptBottomRight,
+        ptBottomLeft,
         dest_size=None,
+        offset=0  # positive is inside, negative outside
         ):
 
     shape = img.shape
+    height, width = shape[:2]
 
-    ptTopLeft, ptTopRight, ptBottomRight, ptBottomLeft = intersections(
-            topEdge,
-            bottomEdge,
-            leftEdge,
-            rightEdge,
-            shape,
-            group,
-            maximize)
+    ptTopLeft = (
+            clip(ptTopLeft[0] + offset, 0, width),
+            clip(ptTopLeft[1] + offset, 0, height),
+            )
+    ptTopRight = (
+            clip(ptTopRight[0] - offset, 0, width),
+            clip(ptTopRight[1] + offset, 0, height),
+            )
+    ptBottomRight = (
+            clip(ptBottomRight[0] - offset, 0, width),
+            clip(ptBottomRight[1] - offset, 0, height),
+            )
+    ptBottomLeft = (
+            clip(ptBottomLeft[0] + offset, 0, width),
+            clip(ptBottomLeft[1] - offset, 0, height),
+            )
 
     if dest_size is None:
         def dist(p1, p2):

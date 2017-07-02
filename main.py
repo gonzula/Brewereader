@@ -31,7 +31,8 @@ if __name__ == '__main__':
         left = min(vertical, key=lambda l: iu.mid_point(l, img.shape)[0])
         right = max(vertical, key=lambda l: iu.mid_point(l, img.shape)[0])
 
-        img = iu.unwarp(img, top, bottom, left, right)
+        tl, tr, br, bl = iu.intersections(top, bottom, left, right, img.shape)
+        img = iu.unwarp(img, tl, tr, br, bl, offset=-5)
 
         horizontal, vertical = iu.find_lines(img)
 
@@ -64,10 +65,17 @@ if __name__ == '__main__':
         vertical = sorted(
                 vertical,
                 key=lambda bin: iu.mid_point(bin[0], img.shape)[0])
+        # horizontal = sorted(
+        #         horizontal,
+        #         key=lambda bin: iu.mid_point(bin[0], img.shape)[1])
+        # vertical = sorted(
+        #         vertical,
+        #         key=lambda bin: iu.mid_point(bin[0], img.shape)[0])
         # for bin in horizontal + vertical:
         #     for rho, theta in bin:
         #         pt1, pt2 = iu.cvt_line(rho, theta, img.shape)
         #         cv2.line(img, pt1, pt2, (0, 255, 0), 5, cv2.LINE_AA)
+
 
         print('horizontal')
         pprint(horizontal)
@@ -86,17 +94,17 @@ if __name__ == '__main__':
         # print(iu.line_dist(v[-2], v[-3], img.shape))
         # print(iu.line_dist(v[-4], v[-5], img.shape))
 
-
         for i in range(1, len(horizontal) - 1):
             for j in range(4, len(vertical) - 2):
-                cell = iu.unwarp(
-                        img,
+                tl, tr, br, bl = iu.intersections(
                         horizontal[i],
                         horizontal[i + 1],
                         vertical[j],
                         vertical[j + 1],
-                        group=True
+                        img.shape,
+                        group=True,
                         )
+                cell = iu.unwarp(img, tl, tr, br, bl, offset=-5)
 
                 bw = cell
                 if len(bw.shape) == 3 and bw.shape[2] == 3:
@@ -120,35 +128,54 @@ if __name__ == '__main__':
                 blur = cv2.GaussianBlur(blur, (11, 11), 0)
                 cell = blur
 
-
                 # blur = cv2.GaussianBlur(cell, (11, 11), 0)
-                cv2.imwrite(f'cells/{i}_{j-4}_1.png', cell)
+                # cv2.imwrite(f'cells/{i}_{j-4}_1.png', cell)
                 canny = cv2.Canny(cell, 50, 200)
-                cv2.imwrite(f'cells/{i}_{j-4}_2.png', canny)
-
+                # cv2.imwrite(f'cells/{i}_{j-4}_2.png', canny)
 
                 h, v = iu.find_lines(canny, 0.4)
                 # cell = cv2.cvtColor(canny, cv2.COLOR_GRAY2RGB)
-                wl = cv2.cvtColor(cell, cv2.COLOR_GRAY2RGB)
+                wl = cv2.cvtColor(canny, cv2.COLOR_GRAY2RGB)
+
+                if not h:
+                    h = [(0, np.pi/2), (cell.shape[0]-1, np.pi/2)]
+                if not v:
+                    h = [(0, 0), (cell.shape[1]-1, 0)]
 
                 for rho, theta in np.append(h, v, axis=0):
                     pt1, pt2 = iu.cvt_line(rho, theta, cell.shape)
                     cv2.line(wl, pt1, pt2, (0, 255, 0), 1, cv2.LINE_4)
                 cv2.imwrite(f'cells/{i}_{j-4}_3.png', wl)
 
-                h = iu.group_lines(h, cell.shape, 'horizontal', merge_distance=20)
-                v = iu.group_lines(v, cell.shape, 'vertical', merge_distance=20)
+                h = iu.group_lines(
+                        h,
+                        cell.shape,
+                        'horizontal',
+                        merge_distance=20)
+                v = iu.group_lines(
+                        v,
+                        cell.shape,
+                        'vertical',
+                        merge_distance=20)
 
-                cell = iu.unwarp(
-                        cell,
+                tl, tr, br, bl = iu.intersections(
                         h[0],
                         h[-1],
                         v[0],
                         v[-1],
-                        True,
-                        False,
-                        (42, 28),
+                        cell.shape,
+                        group=True,
+                        maximize=False,
                         )
+                cell = iu.unwarp(
+                        cell,
+                        tl,
+                        tr,
+                        br,
+                        bl,
+                        dest_size=(42, 28),
+                        )
+
                 cell = cv2.adaptiveThreshold(
                         cell,
                         255,
@@ -165,16 +192,6 @@ if __name__ == '__main__':
                 #     pt1, pt2 = iu.cvt_line(rho, theta, cell.shape)
                 #     cv2.line(cell, pt1, pt2, (0, 255, 0), 1, cv2.LINE_4)
                 # cv2.imwrite(f'cells/{i}_{j-4}_3.png', cell)
-
-
-
-        # fig, ax = plt.subplots()
-        # fig.canvas.set_window_title(fname)
-        # ax.imshow(img)
-        # ax.axis('off')  # clear x- and y-axes
-        # mng = plt.get_current_fig_manager()
-        # mng.full_screen_toggle()
-        # plt.show()
 
         # output = img
         # cv2.imwrite('img.png', output)
