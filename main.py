@@ -59,12 +59,6 @@ if __name__ == '__main__':
                     [np.array([img.shape[1], 0])]
                     )
 
-        horizontal = sorted(
-                horizontal,
-                key=lambda bin: iu.mid_point(bin[0], img.shape)[1])
-        vertical = sorted(
-                vertical,
-                key=lambda bin: iu.mid_point(bin[0], img.shape)[0])
         # horizontal = sorted(
         #         horizontal,
         #         key=lambda bin: iu.mid_point(bin[0], img.shape)[1])
