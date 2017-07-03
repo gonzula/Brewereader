@@ -10,6 +10,10 @@ import pca
 X = np.load('dataset_X.npy')
 Y = np.load('dataset_Y.npy')
 
+cnt = np.empty((X.shape[0], 1))
+for idx, x in enumerate(X):
+    cnt[idx, 0] = sum(x > 127)/len(x)  # last column
+X = np.append(X, cnt, axis=1)
 
 train_size = int(0.8 * X.shape[0])
 
