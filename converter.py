@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 
 import cv2
 import numpy as np
@@ -8,7 +8,7 @@ import os
 
 dimension = 42 * 28
 
-dirname = 'cells'
+dirname = 'centered'
 files = [fname for fname in os.listdir(dirname) if fname.endswith('.png')]
 files = sorted(files, key=lambda f: int(f.split('_')[0]))
 
