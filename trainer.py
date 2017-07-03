@@ -10,7 +10,6 @@ import pca
 X = np.load('dataset_X.npy')
 Y = np.load('dataset_Y.npy')
 
-X = pca.pca(X, numpc=300)
 
 train_size = int(0.8 * X.shape[0])
 
@@ -24,7 +23,8 @@ train_Y = Y[:train_size]
 test_X = X[train_size:]
 test_Y = Y[train_size:]
 
-model = mlp.MLP([train_X.shape[1], 200, train_Y.shape[1]])
+train_X, test_X = pca.pca(train_X, test_X, numpc=40)
+model = mlp.MLP([train_X.shape[1], 20, train_Y.shape[1]])
 model.train(train_X, train_Y)
 print('finished training')
 
