@@ -14,6 +14,7 @@ Y = np.load('dataset_Y.npy')
 train_size = int(0.8 * X.shape[0])
 
 shuffle_ids = np.arange(X.shape[0])
+np.random.seed(666)
 np.random.shuffle(shuffle_ids)
 X = X[shuffle_ids]
 Y = Y[shuffle_ids]
