@@ -3,6 +3,7 @@
 
 import numpy as np
 
+
 def pca(A, B=None, numpc=None):
     A = (A - np.mean(A.T, axis=1)).T
     latent, coeff = np.linalg.eig(np.cov(A))

@@ -17,12 +17,13 @@ files = sorted(files, key=lambda f: int(f.split('_')[0]))
 for fname in files:
     img = cv2.imread(os.path.join(dirname, fname))
 
-    height,width = img.shape[:2]
+    height, width = img.shape[:2]
     threshold = 150
     element = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
-    bw = cv2.dilate(img, element,
+    bw = cv2.dilate(
+            img, element,
             borderType=cv2.BORDER_CONSTANT,
-            borderValue=(255,255,255))
+            borderValue=(255, 255, 255))
 
     # fig, ax = plt.subplots()
     # fig.canvas.set_window_title(fname)

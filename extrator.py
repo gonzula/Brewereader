@@ -67,7 +67,6 @@ if __name__ == '__main__':
         #         vertical,
         #         key=lambda bin: iu.mid_point(bin[0], img.shape)[0])
 
-
         # wl = np.copy(img)
         # colors = [
         #         (255, 0, 0),
