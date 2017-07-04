@@ -60,26 +60,24 @@ for fname in files:
                         max(max_point[1], y),
                         )
                 black_pix = True
-    if not black_pix:
-        continue
+    if black_pix:
+        min_point = np.asarray(min_point)
+        max_point = np.asarray(max_point)
+        center = (min_point + max_point) / 2
+        center = np.rint(center)
+        print(fname, center)
+        image_center = np.asarray([width, height]) / 2
+        center -= image_center
 
-    min_point = np.asarray(min_point)
-    max_point = np.asarray(max_point)
-    center = (min_point + max_point) / 2
-    center = np.rint(center)
-    print(fname, center)
-    image_center = np.asarray([width, height]) / 2
-    center -= image_center
-
-    M = [
-            [1, 0, -center[0]],
-            [0, 1, -center[1]],
-    ]
-    M = np.matrix(M)
-    img = cv2.warpAffine(
-            img, M, (width, height),
-            cv2.INTER_LINEAR,
-            borderMode=cv2.BORDER_CONSTANT,
-            borderValue=(255, 255, 255),
-            )
+        M = [
+                [1, 0, -center[0]],
+                [0, 1, -center[1]],
+        ]
+        M = np.matrix(M)
+        img = cv2.warpAffine(
+                img, M, (width, height),
+                cv2.INTER_LINEAR,
+                borderMode=cv2.BORDER_CONSTANT,
+                borderValue=(255, 255, 255),
+                )
     cv2.imwrite(os.path.join(dstdirname, fname), img)
