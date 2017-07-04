@@ -68,7 +68,7 @@ if __name__ == '__main__':
         #         key=lambda bin: iu.mid_point(bin[0], img.shape)[0])
 
 
-        # wl = img
+        # wl = np.copy(img)
         # colors = [
         #         (255, 0, 0),
         #         (0, 255, 0),
@@ -87,6 +87,7 @@ if __name__ == '__main__':
         # mng = plt.get_current_fig_manager()
         # mng.full_screen_toggle()
         # plt.show()
+        # continue
 
         # v = vertical
 
@@ -179,7 +180,7 @@ if __name__ == '__main__':
                         br,
                         bl,
                         dest_size=(42, 28),
-                        offset=-4,
+                        offset=2,
                         )
 
                 # cell = cv2.adaptiveThreshold(
