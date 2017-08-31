@@ -16,6 +16,7 @@ In an attempt to solve this wasted time I developed a script that reads the imag
 The only action required by the user is to take a picture of the paper.
 
 The script, using [`OpenCV`](http://opencv.org/), separates each cell using a Hough transformation
+
 ![Hough transformation](https://raw.githubusercontent.com/ceafdc/Brewereader/master/README_Images/img5.png)
 
 After that, runs a [`MLP`](https://en.wikipedia.org/wiki/Multilayer_perceptron), written in `Python` with [`numpy`](http://www.numpy.org), on each cell
