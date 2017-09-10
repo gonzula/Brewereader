@@ -34,4 +34,4 @@ And together, we managed to draw 33,000 sticks
 
 ## The results
 
-The algorithm gets 90% accuracy. Since this software deals with money, 90% accuracy is not enough, but the mistakes are very likely to be noticed, before any payment is made. Since the spreadsheet knows how much beer has been bought, it knows how much has to be marked on the paper, and if the numbers don't match, probably we have an error.
+The algorithm gets 90% accuracy. Since this software deals with money, 90% accuracy is not enough, but the mistakes are very likely to be noticed before any payment is made. Once the spreadsheet knows how much beer has been bought, it knows how much has to be marked on the paper, and if the numbers don't match, probably we have an error.
